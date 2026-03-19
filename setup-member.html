@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SKD International — Member Setup Guide</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --orange: #d29922;
+    --red: #f85149;
+    --purple: #bc8cff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.5rem;
+  }
+  h2 {
+    font-size: 1.4rem;
+    margin: 2rem 0 1rem;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  h2 .step {
+    background: var(--accent);
+    color: var(--bg);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .card p { color: var(--muted); margin-bottom: 0.75rem; }
+  .role-banner {
+    background: linear-gradient(135deg, rgba(88,166,255,0.1), rgba(188,140,255,0.1));
+    border: 1px solid var(--accent);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+  }
+  .role-banner h3 { color: var(--accent); margin-bottom: 0.5rem; }
+  .role-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+  .role-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+  }
+  .role-card h4 { color: var(--purple); margin-bottom: 0.25rem; }
+  .role-card .perms { color: var(--muted); font-size: 0.85rem; }
+  .access-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+  }
+  .access-table th, .access-table td {
+    padding: 0.6rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .access-table th {
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .yes { color: var(--green); }
+  .no { color: var(--red); }
+  .limited { color: var(--orange); }
+  pre {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    overflow-x: auto;
+    font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 0.9rem;
+    margin: 0.75rem 0;
+  }
+  code { color: var(--green); }
+  .comment { color: var(--muted); }
+  .note {
+    background: rgba(210,153,34,0.1);
+    border-left: 3px solid var(--orange);
+    padding: 0.75rem 1rem;
+    border-radius: 0 8px 8px 0;
+    margin: 0.75rem 0;
+    font-size: 0.9rem;
+  }
+  .warning {
+    background: rgba(248,81,73,0.1);
+    border-left: 3px solid var(--red);
+    padding: 0.75rem 1rem;
+    border-radius: 0 8px 8px 0;
+    margin: 0.75rem 0;
+    font-size: 0.9rem;
+  }
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  .tag.required { background: rgba(248,81,73,0.15); color: var(--red); }
+  .tag.recommended { background: rgba(63,185,80,0.15); color: var(--green); }
+  .tag.optional { background: rgba(210,153,34,0.15); color: var(--orange); }
+  .app-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 0.75rem;
+    margin: 1rem 0;
+  }
+  .app-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+  }
+  .app-item .name { font-weight: 600; }
+  .app-item .desc { font-size: 0.8rem; color: var(--muted); }
+  .checklist { list-style: none; padding: 0; }
+  .checklist li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .check { color: var(--green); flex-shrink: 0; }
+  footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.85rem;
+    text-align: center;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<h1>Member Setup Guide</h1>
+<p class="subtitle">SKD International — Getting started as a team member</p>
+
+<!-- ROLE EXPLAINER -->
+<div class="role-banner">
+  <h3>Access Levels</h3>
+  <p style="color: var(--muted);">SKD has two roles. Your access depends on which one you are.</p>
+  <div class="role-grid">
+    <div class="role-card">
+      <h4>Admin</h4>
+      <div class="perms">Full access to everything — VPS root, GitHub admin, OANDA keys, infrastructure decisions. Currently: Niksa + xxtox1chxx only.</div>
+    </div>
+    <div class="role-card">
+      <h4>Member</h4>
+      <div class="perms">Access to shared knowledge, Discord, GitHub repos (read + PR), Obsidian vault. No VPS root, no trading keys, no infra changes.</div>
+    </div>
+  </div>
+</div>
+
+<!-- ACCESS TABLE -->
+<h2><span class="step">i</span> What You Get Access To</h2>
+<div class="card">
+  <table class="access-table">
+    <thead>
+      <tr><th>Resource</th><th>Admin</th><th>Member</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Discord server</td><td class="yes">Full</td><td class="yes">Full</td></tr>
+      <tr><td>GitHub repos (read)</td><td class="yes">Full</td><td class="yes">Full</td></tr>
+      <tr><td>GitHub repos (push to main)</td><td class="yes">Full</td><td class="no">PRs only</td></tr>
+      <tr><td>Obsidian BrainVault</td><td class="yes">Full</td><td class="yes">Read + contribute</td></tr>
+      <tr><td>n8n dashboard (view)</td><td class="yes">Full</td><td class="limited">View only</td></tr>
+      <tr><td>n8n (create/edit flows)</td><td class="yes">Full</td><td class="no">No</td></tr>
+      <tr><td>Hetzner VPS (SSH)</td><td class="yes">Root</td><td class="no">No</td></tr>
+      <tr><td>OANDA / trading</td><td class="yes">Full</td><td class="no">No</td></tr>
+      <tr><td>Netdata monitoring</td><td class="yes">Full</td><td class="limited">View only</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- STEP 1 -->
+<h2><span class="step">1</span> Accept Invites</h2>
+<div class="card">
+  <p>You should have received invites to the following. Accept all of them.</p>
+  <ul class="checklist">
+    <li><span class="check">□</span> <strong>GitHub</strong> — join the <a href="https://github.com/SKD-international">SKD-international</a> org (check your email or GitHub notifications)</li>
+    <li><span class="check">□</span> <strong>Discord</strong> — join the SKD International server (link from an admin)</li>
+  </ul>
+</div>
+
+<!-- STEP 2 -->
+<h2><span class="step">2</span> Install Apps</h2>
+<div class="card">
+  <p>Install these on your machine (Mac or Windows — doesn't matter).</p>
+
+  <div class="app-grid">
+    <div class="app-item">
+      <div><div class="name">Discord <span class="tag required">required</span></div><div class="desc">Team chat &amp; voice</div></div>
+    </div>
+    <div class="app-item">
+      <div><div class="name">Obsidian <span class="tag required">required</span></div><div class="desc">Shared knowledge base</div></div>
+    </div>
+    <div class="app-item">
+      <div><div class="name">VS Code <span class="tag recommended">recommended</span></div><div class="desc">Code editor</div></div>
+    </div>
+    <div class="app-item">
+      <div><div class="name">Git <span class="tag required">required</span></div><div class="desc">Version control</div></div>
+    </div>
+  </div>
+
+  <p style="margin-top: 1rem;"><strong>Mac:</strong></p>
+  <pre><code>brew install git gh
+brew install --cask obsidian discord visual-studio-code</code></pre>
+
+  <p><strong>Windows:</strong></p>
+  <pre><code>winget install Git.Git
+winget install GitHub.cli
+winget install Obsidian.Obsidian
+winget install Discord.Discord
+winget install Microsoft.VisualStudioCode</code></pre>
+</div>
+
+<!-- STEP 3 -->
+<h2><span class="step">3</span> GitHub &amp; SSH</h2>
+<div class="card">
+  <p>Set up Git and clone the repos you have access to.</p>
+  <pre><code><span class="comment"># Generate SSH key (if you don't have one)</span>
+ssh-keygen -t ed25519 -C "your-email@example.com"
+
+<span class="comment"># Copy your public key</span>
+<span class="comment"># Mac:</span>
+pbcopy < ~/.ssh/id_ed25519.pub
+<span class="comment"># Windows:</span>
+Get-Content ~/.ssh/id_ed25519.pub | Set-Clipboard
+
+<span class="comment"># Add to GitHub: Settings → SSH Keys → New SSH Key → Paste</span>
+
+<span class="comment"># Authenticate</span>
+gh auth login
+
+<span class="comment"># Clone repos</span>
+mkdir -p ~/Documents/skd
+cd ~/Documents/skd
+gh repo clone SKD-international/brain
+gh repo clone SKD-international/docs</code></pre>
+
+  <div class="note">You can clone <code>trading-infra</code> and <code>oanda-mcp</code> too (read access), but you'll need to open a Pull Request for changes — you can't push to main directly.</div>
+</div>
+
+<!-- STEP 4 -->
+<h2><span class="step">4</span> Obsidian (BrainVault)</h2>
+<div class="card">
+  <p>Open the shared knowledge base and set up auto-sync.</p>
+  <pre><code><span class="comment"># Open Obsidian</span>
+<span class="comment"># → "Open folder as vault"</span>
+<span class="comment"># → Select: ~/Documents/skd/brain</span>
+
+<span class="comment"># Set up auto-sync:</span>
+<span class="comment"># 1. Settings → Community Plugins → Turn on community plugins</span>
+<span class="comment"># 2. Browse → search "Obsidian Git" → Install → Enable</span>
+<span class="comment"># 3. Obsidian Git settings:</span>
+<span class="comment">#    - Auto pull interval: 5 minutes</span>
+<span class="comment">#    - Auto push interval: 10 minutes</span>
+<span class="comment">#    - Pull on startup: ON</span></code></pre>
+  <p>Start with the <strong>Home</strong> note — it links to everything: trading docs, infra plans, learning tracks, templates.</p>
+</div>
+
+<!-- STEP 5 -->
+<h2><span class="step">5</span> Contributing</h2>
+<div class="card">
+  <p>How to contribute as a member.</p>
+
+  <h3 style="color: var(--green); margin: 1rem 0 0.5rem;">Obsidian / Brain Vault</h3>
+  <p>Edit and add notes freely — Obsidian Git will auto-push your changes. Use the templates in <code>07 - Templates/</code> for consistency.</p>
+
+  <h3 style="color: var(--green); margin: 1rem 0 0.5rem;">Code (trading-infra, oanda-mcp)</h3>
+  <pre><code><span class="comment"># Create a branch for your work</span>
+git checkout -b feature/your-feature-name
+
+<span class="comment"># Make changes, commit</span>
+git add .
+git commit -m "Add your feature"
+
+<span class="comment"># Push and create a Pull Request</span>
+git push -u origin feature/your-feature-name
+gh pr create --title "Your feature" --body "Description"
+
+<span class="comment"># An admin will review and merge</span></code></pre>
+
+  <div class="warning"><strong>Do not</strong> push directly to <code>main</code> on code repos. Always use a branch + PR. Admins will review and merge.</div>
+</div>
+
+<!-- STEP 6 -->
+<h2><span class="step">6</span> Dashboards (View Only)</h2>
+<div class="card">
+  <p>You can view these in your browser — no login required from the local network.</p>
+  <pre><code><span class="comment"># n8n — automation workflows</span>
+http://204.168.169.124:5678
+
+<span class="comment"># Netdata — server monitoring</span>
+http://204.168.169.124:19999</code></pre>
+  <div class="note">These are view-only for members. Ask an admin if you want to create or modify automation flows.</div>
+</div>
+
+<!-- CHECKLIST -->
+<h2><span class="step">✓</span> Final Checklist</h2>
+<div class="card">
+  <ul class="checklist">
+    <li><span class="check">□</span> Accepted GitHub org invite</li>
+    <li><span class="check">□</span> Joined Discord server</li>
+    <li><span class="check">□</span> Git, Obsidian, Discord installed</li>
+    <li><span class="check">□</span> SSH key on GitHub</li>
+    <li><span class="check">□</span> Repos cloned (<code>brain</code>, <code>docs</code>)</li>
+    <li><span class="check">□</span> BrainVault open in Obsidian with Git plugin</li>
+    <li><span class="check">□</span> Can view n8n and Netdata dashboards</li>
+  </ul>
+</div>
+
+<footer>
+  SKD International &mdash; 2026 &mdash; <a href="https://github.com/SKD-international">github.com/SKD-international</a>
+  <br><br>
+  <span style="color: var(--muted);">Need admin access? Talk to Niksa or xxtox1chxx.</span>
+</footer>
+
+</body>
+</html>
