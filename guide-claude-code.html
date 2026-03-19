@@ -1,0 +1,956 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Claude Code — The Complete Beginner's Guide</title>
+<style>
+/* ── Reset & Base ── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #0d1117; --surface: #161b22; --surface2: #1c2129; --border: #30363d;
+  --accent: #58a6ff; --green: #3fb950; --purple: #bc8cff; --orange: #f0883e;
+  --red: #f85149; --yellow: #d29922; --pink: #f778ba;
+  --text: #e6edf3; --text-muted: #8b949e; --text-dim: #484f58;
+  --radius: 12px; --shadow: 0 8px 32px rgba(0,0,0,.4);
+}
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.7; font-size: 16px;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: var(--accent); text-decoration: none; }
+a:hover { text-decoration: underline; }
+
+/* ── Animated background ── */
+body::before {
+  content: ''; position: fixed; inset: 0; z-index: -1;
+  background: radial-gradient(ellipse 80% 60% at 50% -20%, rgba(88,166,255,.07) 0%, transparent 60%),
+              radial-gradient(ellipse 60% 50% at 80% 50%, rgba(188,140,255,.05) 0%, transparent 50%),
+              radial-gradient(ellipse 60% 50% at 20% 80%, rgba(63,185,80,.04) 0%, transparent 50%);
+}
+
+/* ── Top progress bar ── */
+#progress { position: fixed; top: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--accent), var(--purple), var(--green)); width: 0%; z-index: 1001; transition: width .15s; border-radius: 0 2px 2px 0; }
+
+/* ── Header ── */
+.hero {
+  text-align: center; padding: 100px 20px 60px; position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; inset: 0;
+  background: radial-gradient(ellipse 70% 50% at 50% 30%, rgba(88,166,255,.12), transparent 70%);
+}
+.hero h1 {
+  font-size: clamp(2.4rem, 6vw, 4rem); font-weight: 800; letter-spacing: -1px;
+  background: linear-gradient(135deg, var(--accent), var(--purple), var(--pink));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; animation: gradShift 6s ease infinite;
+  background-size: 200% 200%; position: relative;
+}
+@keyframes gradShift { 0%,100%{background-position:0% 50%} 50%{background-position:100% 50%} }
+.hero .subtitle { color: var(--text-muted); font-size: 1.25rem; margin-top: 12px; position: relative; }
+.hero .version-badge {
+  display: inline-block; margin-top: 20px; padding: 6px 16px; border-radius: 20px;
+  background: rgba(88,166,255,.12); border: 1px solid rgba(88,166,255,.25);
+  color: var(--accent); font-size: .85rem; font-weight: 600; position: relative;
+}
+
+/* ── Layout ── */
+.wrapper { display: flex; max-width: 1280px; margin: 0 auto; padding: 0 20px; gap: 40px; }
+.main { flex: 1; min-width: 0; padding-bottom: 100px; }
+
+/* ── Sidebar TOC ── */
+.sidebar {
+  position: sticky; top: 80px; width: 240px; height: fit-content; flex-shrink: 0;
+  padding: 20px 0; display: none;
+}
+@media (min-width: 1024px) { .sidebar { display: block; } }
+.sidebar nav { border-left: 2px solid var(--border); padding-left: 16px; }
+.sidebar a {
+  display: block; padding: 6px 0; font-size: .85rem; color: var(--text-muted);
+  transition: color .2s, transform .2s;
+}
+.sidebar a:hover, .sidebar a.active { color: var(--accent); text-decoration: none; transform: translateX(4px); }
+.sidebar .toc-title { font-size: .7rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-dim); margin-bottom: 12px; font-weight: 700; }
+
+/* ── Section ── */
+.section { margin-bottom: 60px; }
+.section-header {
+  display: flex; align-items: center; gap: 14px; margin-bottom: 28px;
+  padding-bottom: 16px; border-bottom: 1px solid var(--border);
+}
+.section-icon {
+  width: 44px; height: 44px; border-radius: 10px; display: flex; align-items: center;
+  justify-content: center; font-size: 1.4rem; flex-shrink: 0;
+}
+.section-header h2 {
+  font-size: 1.7rem; font-weight: 700;
+  background: linear-gradient(135deg, var(--text), var(--accent));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+.section-header .tag {
+  font-size: .65rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 700;
+  padding: 3px 10px; border-radius: 10px; margin-left: auto; flex-shrink: 0;
+}
+.tag-required { background: rgba(248,81,73,.15); color: var(--red); }
+.tag-optional { background: rgba(210,153,34,.15); color: var(--yellow); }
+.tag-advanced { background: rgba(188,140,255,.15); color: var(--purple); }
+
+/* ── Cards ── */
+.card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+  padding: 24px; margin-bottom: 16px; transition: border-color .25s, box-shadow .25s, transform .25s;
+}
+.card:hover { border-color: rgba(88,166,255,.3); box-shadow: 0 4px 24px rgba(88,166,255,.08); transform: translateY(-2px); }
+
+.card-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+.card-grid .card { margin-bottom: 0; }
+
+.card h3 { font-size: 1.1rem; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
+.card p, .card li { color: var(--text-muted); font-size: .95rem; }
+.card ul { padding-left: 20px; margin-top: 8px; }
+.card li { margin-bottom: 4px; }
+
+/* ── MCP cards ── */
+.mcp-card { display: flex; gap: 16px; align-items: flex-start; }
+.mcp-icon {
+  width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center;
+  justify-content: center; font-size: 1.5rem; flex-shrink: 0;
+}
+.mcp-body { flex: 1; }
+.mcp-body h3 { margin-bottom: 4px; font-size: 1rem; }
+.mcp-body .mcp-desc { color: var(--text-muted); font-size: .9rem; margin-bottom: 8px; }
+
+/* ── Code blocks ── */
+pre {
+  background: var(--surface2); border: 1px solid var(--border); border-radius: 8px;
+  padding: 16px 20px; overflow-x: auto; font-size: .88rem; line-height: 1.6;
+  margin: 12px 0 16px; font-family: 'SF Mono', 'Fira Code', 'Cascadia Code', monospace;
+}
+code { font-family: inherit; }
+.code-label {
+  display: inline-block; font-size: .7rem; text-transform: uppercase; letter-spacing: 1px;
+  color: var(--text-dim); font-weight: 600; margin-bottom: 4px;
+}
+.inline-code {
+  background: rgba(88,166,255,.1); color: var(--accent); padding: 2px 7px; border-radius: 4px;
+  font-family: 'SF Mono', monospace; font-size: .88em;
+}
+
+/* syntax colors inside pre */
+.kw { color: var(--red); } .str { color: #a5d6ff; } .cm { color: var(--text-dim); font-style: italic; }
+.fn { color: var(--purple); } .op { color: var(--orange); } .nr { color: var(--green); }
+.prompt { color: var(--green); user-select: none; }
+.output { color: var(--text-dim); }
+
+/* ── Collapsible ── */
+details { margin-bottom: 12px; }
+details summary {
+  cursor: pointer; padding: 14px 20px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: var(--radius); font-weight: 600; font-size: .95rem;
+  display: flex; align-items: center; gap: 10px; transition: all .2s; list-style: none;
+}
+details summary::-webkit-details-marker { display: none; }
+details summary::before { content: '\25B6'; font-size: .7rem; transition: transform .2s; color: var(--accent); }
+details[open] summary::before { transform: rotate(90deg); }
+details[open] summary { border-radius: var(--radius) var(--radius) 0 0; border-bottom-color: transparent; background: var(--surface2); }
+details .details-body {
+  padding: 20px; background: var(--surface); border: 1px solid var(--border);
+  border-top: none; border-radius: 0 0 var(--radius) var(--radius);
+}
+
+/* ── Workflow steps ── */
+.step { display: flex; gap: 16px; margin-bottom: 24px; }
+.step-num {
+  width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center;
+  justify-content: center; font-weight: 800; font-size: .9rem; flex-shrink: 0;
+  background: linear-gradient(135deg, var(--accent), var(--purple)); color: #fff;
+}
+.step-content { flex: 1; }
+.step-content h4 { font-size: 1rem; margin-bottom: 4px; }
+.step-content p { color: var(--text-muted); font-size: .9rem; }
+
+/* ── Tip box ── */
+.tip {
+  padding: 16px 20px; border-radius: var(--radius); margin: 16px 0;
+  display: flex; gap: 12px; align-items: flex-start; font-size: .9rem;
+}
+.tip-info { background: rgba(88,166,255,.08); border-left: 3px solid var(--accent); }
+.tip-warn { background: rgba(210,153,34,.08); border-left: 3px solid var(--yellow); }
+.tip-success { background: rgba(63,185,80,.08); border-left: 3px solid var(--green); }
+.tip-icon { font-size: 1.1rem; flex-shrink: 0; line-height: 1.5; }
+
+/* ── Pill list ── */
+.pills { display: flex; flex-wrap: wrap; gap: 8px; margin: 12px 0; }
+.pill {
+  padding: 5px 14px; border-radius: 20px; font-size: .8rem; font-weight: 600;
+  border: 1px solid var(--border); background: var(--surface2); color: var(--text-muted);
+  transition: all .2s;
+}
+.pill:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── Table ── */
+.table-wrap { overflow-x: auto; margin: 12px 0; }
+table { width: 100%; border-collapse: collapse; font-size: .9rem; }
+th { text-align: left; padding: 10px 14px; border-bottom: 2px solid var(--border); color: var(--text-muted); font-size: .8rem; text-transform: uppercase; letter-spacing: .5px; }
+td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
+tr:hover td { background: rgba(88,166,255,.03); }
+
+/* ── Footer ── */
+footer {
+  text-align: center; padding: 40px 20px; border-top: 1px solid var(--border);
+  color: var(--text-dim); font-size: .85rem;
+}
+footer .brand {
+  font-weight: 700; font-size: 1rem;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .hero { padding: 60px 16px 40px; }
+  .wrapper { padding: 0 12px; }
+  .card { padding: 18px; }
+  .card-grid { grid-template-columns: 1fr; }
+  .mcp-card { flex-direction: column; gap: 10px; }
+}
+
+/* ── Back to top ── */
+.back-top {
+  position: fixed; bottom: 30px; right: 30px; width: 44px; height: 44px;
+  border-radius: 50%; background: var(--accent); color: #fff; border: none;
+  font-size: 1.2rem; cursor: pointer; opacity: 0; pointer-events: none;
+  transition: opacity .3s, transform .3s; display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(88,166,255,.3); z-index: 999;
+}
+.back-top.show { opacity: 1; pointer-events: auto; }
+.back-top:hover { transform: scale(1.1); }
+</style>
+</head>
+<body>
+
+<div id="progress"></div>
+
+<!-- ════════════════════ HERO ════════════════════ -->
+<header class="hero">
+  <h1>Claude Code</h1>
+  <p class="subtitle">The Complete Beginner's Guide to AI-Powered Development</p>
+  <span class="version-badge">2026 Edition</span>
+</header>
+
+<!-- ════════════════════ WRAPPER ════════════════════ -->
+<div class="wrapper">
+
+<!-- ── Sidebar ── -->
+<aside class="sidebar">
+  <nav>
+    <div class="toc-title">Contents</div>
+    <a href="#what-is">What is Claude Code</a>
+    <a href="#installation">Installation</a>
+    <a href="#basic-usage">Basic Usage</a>
+    <a href="#slash-commands">Slash Commands</a>
+    <a href="#mcp-servers">MCP Servers</a>
+    <a href="#skills">Skills / Superpowers</a>
+    <a href="#agents">Agent System</a>
+    <a href="#tips">Tips &amp; Tricks</a>
+    <a href="#workflows">Real Workflows</a>
+  </nav>
+</aside>
+
+<!-- ── Main Content ── -->
+<main class="main">
+
+<!-- ════════ 1. WHAT IS CLAUDE CODE ════════ -->
+<section class="section" id="what-is">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(88,166,255,.12);color:var(--accent)">&#x1F9E0;</div>
+    <h2>What is Claude Code?</h2>
+    <span class="tag tag-required">Start Here</span>
+  </div>
+
+  <div class="card">
+    <h3>Your AI coding partner, right in the terminal</h3>
+    <p>Claude Code is Anthropic's official command-line tool that brings Claude directly into your development workflow. Think of it as a brilliant colleague who can:</p>
+    <ul>
+      <li><strong>Read and write files</strong> across your entire codebase</li>
+      <li><strong>Run terminal commands</strong> &mdash; build, test, deploy, anything</li>
+      <li><strong>Search your code</strong> intelligently to understand context</li>
+      <li><strong>Browse the web</strong> for documentation and references</li>
+      <li><strong>Connect to external services</strong> via MCP servers (Slack, Notion, GitHub, and more)</li>
+      <li><strong>Spawn sub-agents</strong> to handle parallel tasks simultaneously</li>
+    </ul>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>&#x1F4AC; Natural Language</h3>
+      <p>Just describe what you want in plain English. No special syntax required.</p>
+    </div>
+    <div class="card">
+      <h3>&#x1F4C1; Full File Access</h3>
+      <p>Claude reads your project structure, understands dependencies, and modifies files directly.</p>
+    </div>
+    <div class="card">
+      <h3>&#x1F50C; Plugin Ecosystem</h3>
+      <p>MCP servers let Claude interact with Slack, GitHub, Notion, your browser, and more.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 2. INSTALLATION ════════ -->
+<section class="section" id="installation">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(63,185,80,.12);color:var(--green)">&#x1F4E6;</div>
+    <h2>Installation</h2>
+    <span class="tag tag-required">Required</span>
+  </div>
+
+  <div class="card">
+    <h3>Step 1 &mdash; Install via npm</h3>
+    <p>You need Node.js 18+ installed. Then run:</p>
+    <span class="code-label">Terminal</span>
+    <pre><span class="prompt">$ </span>npm install -g @anthropic-ai/claude-code</pre>
+  </div>
+
+  <div class="card">
+    <h3>Step 2 &mdash; Launch Claude Code</h3>
+    <p>Navigate to your project directory and start Claude:</p>
+    <span class="code-label">Terminal</span>
+    <pre><span class="prompt">$ </span><span class="kw">cd</span> my-project
+<span class="prompt">$ </span>claude</pre>
+    <p style="margin-top:10px">Claude will detect your project, read your codebase, and be ready for instructions.</p>
+  </div>
+
+  <div class="card">
+    <h3>Step 3 &mdash; Authenticate</h3>
+    <p>On first launch, you will be prompted to log in with your Anthropic account. Follow the browser-based auth flow, and you are set.</p>
+  </div>
+
+  <div class="tip tip-info">
+    <span class="tip-icon">&#x1F4A1;</span>
+    <div><strong>Tip:</strong> Create a <span class="inline-code">CLAUDE.md</span> file in your project root with instructions for Claude. It reads this automatically on every conversation start.</div>
+  </div>
+</section>
+
+<!-- ════════ 3. BASIC USAGE ════════ -->
+<section class="section" id="basic-usage">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(247,120,186,.12);color:var(--pink)">&#x2328;&#xFE0F;</div>
+    <h2>Basic Usage</h2>
+    <span class="tag tag-required">Required</span>
+  </div>
+
+  <div class="card">
+    <h3>Just type what you want</h3>
+    <p>Claude Code understands natural language. There is no special syntax to learn. Simply describe what you need:</p>
+    <span class="code-label">You type</span>
+    <pre><span class="prompt">&gt; </span>fix the bug in auth.py where users can't log in with email</pre>
+    <p>Claude will:</p>
+    <ol style="padding-left:20px;color:var(--text-muted);font-size:.95rem;margin-top:8px">
+      <li>Search for <span class="inline-code">auth.py</span> in your project</li>
+      <li>Read the file and understand the authentication logic</li>
+      <li>Identify the bug and propose a fix</li>
+      <li>Apply the fix directly to the file (with your approval)</li>
+    </ol>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>&#x1F41B; Fix Bugs</h3>
+      <pre><span class="prompt">&gt; </span>fix the TypeError in utils/parser.js</pre>
+    </div>
+    <div class="card">
+      <h3>&#x2728; Add Features</h3>
+      <pre><span class="prompt">&gt; </span>add a login page with email and password fields</pre>
+    </div>
+    <div class="card">
+      <h3>&#x1F4D6; Explain Code</h3>
+      <pre><span class="prompt">&gt; </span>explain what the process_payment function does</pre>
+    </div>
+    <div class="card">
+      <h3>&#x1F9EA; Write Tests</h3>
+      <pre><span class="prompt">&gt; </span>write unit tests for the User model</pre>
+    </div>
+    <div class="card">
+      <h3>&#x267B;&#xFE0F; Refactor</h3>
+      <pre><span class="prompt">&gt; </span>refactor the database module to use async/await</pre>
+    </div>
+    <div class="card">
+      <h3>&#x1F680; Deploy</h3>
+      <pre><span class="prompt">&gt; </span>build the project and deploy to production</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 4. SLASH COMMANDS ════════ -->
+<section class="section" id="slash-commands">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(188,140,255,.12);color:var(--purple)">&#x2F;</div>
+    <h2>Slash Commands</h2>
+    <span class="tag tag-optional">Essential</span>
+  </div>
+
+  <p style="color:var(--text-muted);margin-bottom:20px">Slash commands are shortcuts that trigger specific behaviors. Type them directly into the Claude Code prompt.</p>
+
+  <div class="table-wrap">
+    <table>
+      <thead>
+        <tr><th>Command</th><th>What It Does</th><th>When To Use</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><span class="inline-code">/help</span></td><td>Show available commands and usage info</td><td>When you are lost or need guidance</td></tr>
+        <tr><td><span class="inline-code">/clear</span></td><td>Clear the current conversation</td><td>Starting fresh on a new task</td></tr>
+        <tr><td><span class="inline-code">/compact</span></td><td>Compress conversation context</td><td>When the conversation gets long and slow</td></tr>
+        <tr><td><span class="inline-code">/review</span></td><td>Review your code changes</td><td>Before committing, get AI feedback</td></tr>
+        <tr><td><span class="inline-code">/commit</span></td><td>Commit with an AI-generated message</td><td>After making changes you are happy with</td></tr>
+        <tr><td><span class="inline-code">/specify [prompt]</span></td><td>Create a BrainGrid requirement spec</td><td>Turning an idea into a structured plan</td></tr>
+        <tr><td><span class="inline-code">/build [req-id]</span></td><td>Get implementation plan for a requirement</td><td>Ready to start building a specified feature</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <details>
+    <summary>Example: Specify &rarr; Build workflow</summary>
+    <div class="details-body">
+      <span class="code-label">Step 1: Create a requirement</span>
+      <pre><span class="prompt">&gt; </span>/specify "Add user authentication with OAuth2 support"
+<span class="output">&#x2713; Created REQ-042: User Authentication with OAuth2
+  - Email/password login
+  - Google OAuth2 integration
+  - JWT token management
+  - Session handling</span></pre>
+      <span class="code-label">Step 2: Get the build plan</span>
+      <pre><span class="prompt">&gt; </span>/build REQ-042
+<span class="output">&#x2713; Implementation plan for REQ-042:
+  Phase 1: Database schema (User, Session tables)
+  Phase 2: Auth routes (/login, /register, /oauth/google)
+  Phase 3: JWT middleware
+  Phase 4: Frontend login form
+  Phase 5: Tests</span></pre>
+    </div>
+  </details>
+</section>
+
+<!-- ════════ 5. MCP SERVERS ════════ -->
+<section class="section" id="mcp-servers">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(240,136,62,.12);color:var(--orange)">&#x1F50C;</div>
+    <h2>MCP Servers</h2>
+    <span class="tag tag-advanced">Power Feature</span>
+  </div>
+
+  <div class="card" style="margin-bottom:28px">
+    <h3>What is MCP?</h3>
+    <p><strong>Model Context Protocol (MCP)</strong> is a plugin system that lets Claude talk to external services. Think of MCP servers as bridges &mdash; each one connects Claude to a different tool or platform. When an MCP server is active, you can simply ask Claude to interact with that service in plain English.</p>
+  </div>
+
+  <div class="tip tip-success">
+    <span class="tip-icon">&#x2705;</span>
+    <div><strong>No API keys needed on your part.</strong> MCP servers handle authentication. Just ask Claude to do things and it routes the request to the right service.</div>
+  </div>
+
+  <!-- Slack -->
+  <div class="card mcp-card">
+    <div class="mcp-icon" style="background:rgba(88,166,255,.12);color:var(--accent)">&#x1F4AC;</div>
+    <div class="mcp-body">
+      <h3>Slack</h3>
+      <p class="mcp-desc">Read and send messages, search channels, create canvases, schedule messages, look up user profiles.</p>
+      <pre><span class="prompt">&gt; </span>send a message to #general saying "deployment is done, v2.4 is live"
+<span class="prompt">&gt; </span>search Slack for messages about the database migration
+<span class="prompt">&gt; </span>read the last 20 messages in #engineering</pre>
+    </div>
+  </div>
+
+  <!-- Notion -->
+  <div class="card mcp-card">
+    <div class="mcp-icon" style="background:rgba(188,140,255,.12);color:var(--purple)">&#x1F4DD;</div>
+    <div class="mcp-body">
+      <h3>Notion</h3>
+      <p class="mcp-desc">Create and update pages, query databases, manage views, search across your workspace, read meeting notes.</p>
+      <pre><span class="prompt">&gt; </span>create a new Notion page with today's meeting notes
+<span class="prompt">&gt; </span>query the "Sprint Tasks" database for items assigned to me
+<span class="prompt">&gt; </span>update the project status page to "In Review"</pre>
+    </div>
+  </div>
+
+  <!-- Gmail -->
+  <div class="card mcp-card">
+    <div class="mcp-icon" style="background:rgba(248,81,73,.12);color:var(--red)">&#x2709;&#xFE0F;</div>
+    <div class="mcp-body">
+      <h3>Gmail</h3>
+      <p class="mcp-desc">Read emails, search your inbox, create drafts, list labels, view full threads.</p>
+      <pre><span class="prompt">&gt; </span>check my latest emails about the project proposal
+<span class="prompt">&gt; </span>draft a reply to the last email from Sarah about the deadline
+<span class="prompt">&gt; </span>search for emails with attachments from last week</pre>
+    </div>
+  </div>
+
+  <!-- GitHub -->
+  <div class="card mcp-card">
+    <div class="mcp-icon" style="background:rgba(63,185,80,.12);color:var(--green)">&#x1F419;</div>
+    <div class="mcp-body">
+      <h3>GitHub</h3>
+      <p class="mcp-desc">Manage repositories, pull requests, issues, branches, releases, code search, and reviews.</p>
+      <pre><span class="prompt">&gt; </span>create a PR for my current branch with a summary of changes
+<span class="prompt">&gt; </span>list open issues labeled "bug" in our repo
+<span class="prompt">&gt; </span>search the codebase on GitHub for uses of deprecated API</pre>
+    </div>
+  </div>
+
+  <!-- Chrome Control -->
+  <div class="card mcp-card">
+    <div class="mcp-icon" style="background:rgba(210,153,34,.12);color:var(--yellow)">&#x1F310;</div>
+    <div class="mcp-body">
+      <h3>Chrome Control</h3>
+      <p class="mcp-desc">Open URLs, navigate tabs, read page content, execute JavaScript, click elements, go back/forward.</p>
+      <pre><span class="prompt">&gt; </span>open hetzner.com and read the pricing page for dedicated servers
+<span class="prompt">&gt; </span>get the content of the page I currently have open in Chrome
+<span class="prompt">&gt; </span>run document.title on the current tab</pre>
+    </div>
+  </div>
+
+  <!-- Mac Control -->
+  <div class="card mcp-card">
+    <div class="mcp-icon" style="background:rgba(247,120,186,.12);color:var(--pink)">&#x1F34E;</div>
+    <div class="mcp-body">
+      <h3>Mac Control (osascript)</h3>
+      <p class="mcp-desc">Full AppleScript automation. Control any Mac application, manage windows, file system operations, system settings.</p>
+      <pre><span class="prompt">&gt; </span>open Finder and create a new folder called "Project Assets" on Desktop
+<span class="prompt">&gt; </span>set my Mac volume to 50%
+<span class="prompt">&gt; </span>get the current playing song from Apple Music</pre>
+    </div>
+  </div>
+
+  <!-- Obsidian -->
+  <div class="card mcp-card">
+    <div class="mcp-icon" style="background:rgba(188,140,255,.12);color:var(--purple)">&#x1F4D3;</div>
+    <div class="mcp-body">
+      <h3>Obsidian</h3>
+      <p class="mcp-desc">Read and write vault notes, search notes, list files, get recent changes, manage periodic notes.</p>
+      <pre><span class="prompt">&gt; </span>add today's dev session notes to the brain vault
+<span class="prompt">&gt; </span>search my Obsidian vault for notes about "trading strategies"
+<span class="prompt">&gt; </span>list all files in the Projects folder of my vault</pre>
+    </div>
+  </div>
+
+  <!-- Google Drive -->
+  <div class="card mcp-card">
+    <div class="mcp-icon" style="background:rgba(88,166,255,.12);color:var(--accent)">&#x1F4C1;</div>
+    <div class="mcp-body">
+      <h3>Google Drive</h3>
+      <p class="mcp-desc">Search for files and fetch their contents from your Google Drive.</p>
+      <pre><span class="prompt">&gt; </span>find the budget spreadsheet in my Drive
+<span class="prompt">&gt; </span>search Drive for documents modified this week</pre>
+    </div>
+  </div>
+
+  <!-- Netdata -->
+  <div class="card mcp-card">
+    <div class="mcp-icon" style="background:rgba(63,185,80,.12);color:var(--green)">&#x1F4CA;</div>
+    <div class="mcp-body">
+      <h3>Netdata</h3>
+      <p class="mcp-desc">Server monitoring, query metrics, detect anomalies, list alerts, find correlated metrics.</p>
+      <pre><span class="prompt">&gt; </span>check if the server CPU usage is normal
+<span class="prompt">&gt; </span>list all raised alerts on my nodes
+<span class="prompt">&gt; </span>find anomalous metrics from the last hour</pre>
+    </div>
+  </div>
+
+  <!-- Claude Preview -->
+  <div class="card mcp-card">
+    <div class="mcp-icon" style="background:rgba(240,136,62,.12);color:var(--orange)">&#x1F5BC;&#xFE0F;</div>
+    <div class="mcp-body">
+      <h3>Claude Preview</h3>
+      <p class="mcp-desc">Start a live preview of web apps, take screenshots, inspect elements, view console logs, monitor network requests.</p>
+      <pre><span class="prompt">&gt; </span>start a preview of my React app on port 3000
+<span class="prompt">&gt; </span>take a screenshot of the current preview
+<span class="prompt">&gt; </span>check the console logs for errors</pre>
+    </div>
+  </div>
+
+  <!-- Context7 -->
+  <div class="card mcp-card">
+    <div class="mcp-icon" style="background:rgba(210,153,34,.12);color:var(--yellow)">&#x1F4DA;</div>
+    <div class="mcp-body">
+      <h3>Context7</h3>
+      <p class="mcp-desc">Look up up-to-date library and framework documentation on demand.</p>
+      <pre><span class="prompt">&gt; </span>look up the FastAPI docs for WebSocket support
+<span class="prompt">&gt; </span>find the React Router v7 migration guide</pre>
+    </div>
+  </div>
+
+  <!-- Docker MCP -->
+  <div class="card mcp-card">
+    <div class="mcp-icon" style="background:rgba(88,166,255,.12);color:var(--accent)">&#x1F433;</div>
+    <div class="mcp-body">
+      <h3>Docker MCP</h3>
+      <p class="mcp-desc">A mega-connector that bundles GitHub, Wikipedia, YouTube transcripts, Obsidian, and more into one MCP server.</p>
+      <pre><span class="prompt">&gt; </span>get the transcript of this YouTube video: https://youtu.be/abc123
+<span class="prompt">&gt; </span>search Wikipedia for "transformer architecture"
+<span class="prompt">&gt; </span>get the summary of the Wikipedia article on reinforcement learning</pre>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 6. SKILLS ════════ -->
+<section class="section" id="skills">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(63,185,80,.12);color:var(--green)">&#x26A1;</div>
+    <h2>Skills / Superpowers</h2>
+    <span class="tag tag-optional">Productivity</span>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <p>Skills are reusable AI workflows &mdash; specialized modes that Claude can enter to tackle tasks with a structured approach. Think of them as expert playbooks.</p>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>&#x1F4A1; Brainstorming</h3>
+      <p>Explore ideas and approaches before writing any code. Great for architecture decisions.</p>
+    </div>
+    <div class="card">
+      <h3>&#x1F4CB; Writing Plans</h3>
+      <p>Create detailed implementation plans with phases, dependencies, and estimated effort.</p>
+    </div>
+    <div class="card">
+      <h3>&#x1F3D7;&#xFE0F; Executing Plans</h3>
+      <p>Step-by-step execution of implementation plans, checking off tasks as they complete.</p>
+    </div>
+    <div class="card">
+      <h3>&#x1F9EA; Test-Driven Development</h3>
+      <p>Write tests first, then implement code to make them pass. Red-green-refactor cycle.</p>
+    </div>
+    <div class="card">
+      <h3>&#x1F50D; Systematic Debugging</h3>
+      <p>Methodical approach: reproduce, isolate, hypothesize, test, fix, verify.</p>
+    </div>
+    <div class="card">
+      <h3>&#x1F50E; Code Review</h3>
+      <p>Review pull requests for bugs, performance, security, and style issues.</p>
+    </div>
+    <div class="card">
+      <h3>&#x1F680; Feature Development</h3>
+      <p>Guided end-to-end feature development from spec to implementation to tests.</p>
+    </div>
+    <div class="card">
+      <h3>&#x1F3A8; Frontend Design</h3>
+      <p>Create beautiful, responsive user interfaces with modern CSS and frameworks.</p>
+    </div>
+    <div class="card">
+      <h3>&#x1F4C4; Office Files</h3>
+      <p>Work with PDF, XLSX, DOCX, and PPTX files. Read, create, and manipulate documents.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ 7. AGENT SYSTEM ════════ -->
+<section class="section" id="agents">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(188,140,255,.12);color:var(--purple)">&#x1F916;</div>
+    <h2>Agent System</h2>
+    <span class="tag tag-advanced">Advanced</span>
+  </div>
+
+  <div class="card" style="margin-bottom:20px">
+    <p>Claude Code can spawn <strong>sub-agents</strong> &mdash; independent AI instances that work on specific sub-tasks in parallel. This is like having a team of specialists working simultaneously.</p>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>&#x1F50D; Explorer Agent</h3>
+      <p>Searches and analyzes the codebase to answer questions about architecture, patterns, and dependencies.</p>
+      <pre><span class="cm">// Claude automatically spawns this when
+// researching a large codebase</span>
+<span class="prompt">&gt; </span>how is authentication handled across the app?</pre>
+    </div>
+    <div class="card">
+      <h3>&#x1F4D0; Plan Agent</h3>
+      <p>Creates architecture plans and implementation strategies based on codebase analysis.</p>
+      <pre><span class="prompt">&gt; </span>plan how to add real-time notifications</pre>
+    </div>
+    <div class="card">
+      <h3>&#x1F4DD; Review Agent</h3>
+      <p>Reviews code changes for correctness, performance, security, and best practices.</p>
+      <pre><span class="prompt">&gt; </span>/review</pre>
+    </div>
+    <div class="card">
+      <h3>&#x26A1; Parallel Execution</h3>
+      <p>Multiple agents work at the same time. While one researches the database schema, another can analyze the API routes.</p>
+    </div>
+  </div>
+
+  <div class="tip tip-info">
+    <span class="tip-icon">&#x1F4A1;</span>
+    <div><strong>You do not need to manually spawn agents.</strong> Claude automatically decides when to use sub-agents based on the complexity of your request.</div>
+  </div>
+</section>
+
+<!-- ════════ 8. TIPS & TRICKS ════════ -->
+<section class="section" id="tips">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(210,153,34,.12);color:var(--yellow)">&#x1F4A1;</div>
+    <h2>Tips &amp; Tricks</h2>
+    <span class="tag tag-optional">Level Up</span>
+  </div>
+
+  <div class="card-grid">
+    <div class="card">
+      <h3>&#x1F4BE; Use CLAUDE.md</h3>
+      <p>Put a <span class="inline-code">CLAUDE.md</span> file in your project root. Claude reads it at the start of every conversation. Include coding standards, architecture notes, and preferred patterns.</p>
+    </div>
+    <div class="card">
+      <h3>&#x1F9F9; Use /compact</h3>
+      <p>When conversations get long, Claude's context window fills up and responses slow down. Run <span class="inline-code">/compact</span> to compress the history while keeping key information.</p>
+    </div>
+    <div class="card">
+      <h3>&#x1F3AF; Be Specific</h3>
+      <p>Instead of "fix the bug", say "fix the null pointer exception in auth.py line 42 that occurs when email is empty". More context = better results.</p>
+    </div>
+    <div class="card">
+      <h3>&#x1F504; Iterative Approach</h3>
+      <p>Build features incrementally. Ask Claude for small steps, review each one, then continue. This gives you more control over the output.</p>
+    </div>
+    <div class="card">
+      <h3>&#x1F9EA; Let Claude Test</h3>
+      <p>Claude can run your test suite, see failures, and fix them. Say "run the tests and fix whatever fails" for a powerful feedback loop.</p>
+    </div>
+    <div class="card">
+      <h3>&#x1F4D3; Knowledge Management</h3>
+      <p>Use Obsidian + Claude for a second brain. Claude can read, write, and search your notes, creating a persistent knowledge base across sessions.</p>
+    </div>
+  </div>
+
+  <details>
+    <summary>Pro Tip: CLAUDE.md example</summary>
+    <div class="details-body">
+      <pre><span class="cm"># CLAUDE.md</span>
+
+<span class="cm">## Project: My Trading App</span>
+<span class="cm">## Stack: Python 3.12, FastAPI, PostgreSQL, React 19</span>
+
+<span class="cm">## Coding Standards</span>
+- Use type hints everywhere
+- Async by default
+- Tests in /tests, mirror src structure
+- Use Ruff for linting
+
+<span class="cm">## Architecture</span>
+- /src/api     - FastAPI routes
+- /src/core    - Business logic
+- /src/models  - SQLAlchemy models
+- /src/services - External service integrations
+
+<span class="cm">## Important Notes</span>
+- Never commit .env files
+- Always run tests before committing
+- Use conventional commits</pre>
+    </div>
+  </details>
+</section>
+
+<!-- ════════ 9. REAL WORKFLOWS ════════ -->
+<section class="section" id="workflows">
+  <div class="section-header">
+    <div class="section-icon" style="background:rgba(248,81,73,.12);color:var(--red)">&#x1F3AC;</div>
+    <h2>Real Workflow Examples</h2>
+    <span class="tag tag-required">See It In Action</span>
+  </div>
+
+  <!-- Workflow 1 -->
+  <details>
+    <summary>&#x1F680; Scenario: Build a REST API from scratch</summary>
+    <div class="details-body">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Describe what you need</h4>
+          <pre><span class="prompt">&gt; </span>create a REST API with FastAPI for a todo app with CRUD operations,
+  SQLite database, and Pydantic models</pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Claude creates the project structure</h4>
+          <pre><span class="output">Creating project structure...
+  &#x2713; src/main.py         - FastAPI app with CORS
+  &#x2713; src/models.py       - SQLAlchemy Todo model
+  &#x2713; src/schemas.py      - Pydantic request/response schemas
+  &#x2713; src/database.py     - SQLite connection setup
+  &#x2713; src/routes/todos.py - CRUD endpoints
+  &#x2713; requirements.txt    - Dependencies
+  &#x2713; tests/test_todos.py - API tests</span></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Ask Claude to run and test it</h4>
+          <pre><span class="prompt">&gt; </span>install dependencies, run the tests, then start the server
+<span class="output">&#x2713; pip install -r requirements.txt
+&#x2713; pytest tests/ - 8 passed, 0 failed
+&#x2713; Server running at http://localhost:8000
+&#x2713; Docs available at http://localhost:8000/docs</span></pre>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <!-- Workflow 2 -->
+  <details>
+    <summary>&#x1F41B; Scenario: Debug a mysterious error</summary>
+    <div class="details-body">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Paste the error</h4>
+          <pre><span class="prompt">&gt; </span>I'm getting "TypeError: Cannot read properties of undefined (reading 'map')"
+  in my React app when I load the dashboard page</pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Claude investigates systematically</h4>
+          <pre><span class="output">Searching for dashboard components...
+Reading src/pages/Dashboard.tsx...
+Found the issue: `data.items.map()` is called before the API
+response arrives. `data` is undefined on first render.
+
+Fix: Add a loading check before mapping.</span></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Claude applies the fix</h4>
+          <pre><span class="output">&#x2713; Updated Dashboard.tsx:
+  - Added loading state
+  - Added null check: data?.items?.map()
+  - Added error boundary fallback</span></pre>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <!-- Workflow 3 -->
+  <details>
+    <summary>&#x1F5A5;&#xFE0F; Scenario: Set up a server</summary>
+    <div class="details-body">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Describe your infrastructure needs</h4>
+          <pre><span class="prompt">&gt; </span>help me set up an Nginx reverse proxy on my Hetzner VPS
+  for my FastAPI app running on port 8000</pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Claude generates configs and commands</h4>
+          <pre><span class="output">&#x2713; Created nginx config: /etc/nginx/sites-available/myapp
+&#x2713; Created systemd service: /etc/systemd/system/myapp.service
+&#x2713; SSL setup with certbot for your domain
+&#x2713; Firewall rules (UFW) for ports 80, 443</span></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Claude can verify the setup</h4>
+          <pre><span class="prompt">&gt; </span>check if the server is running and accessible
+<span class="output">&#x2713; Nginx: active (running)
+&#x2713; MyApp service: active (running)
+&#x2713; SSL certificate: valid, expires 2026-06-18
+&#x2713; https://myapp.com - 200 OK</span></pre>
+        </div>
+      </div>
+    </div>
+  </details>
+
+  <!-- Workflow 4 -->
+  <details>
+    <summary>&#x1F4C8; Scenario: Create a trading dashboard</summary>
+    <div class="details-body">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-content">
+          <h4>Describe the dashboard</h4>
+          <pre><span class="prompt">&gt; </span>build a trading dashboard with:
+  - real-time candlestick chart (lightweight-charts)
+  - order book visualization
+  - account balance and P&amp;L display
+  - dark theme matching my terminal style</pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-content">
+          <h4>Claude builds the full frontend</h4>
+          <pre><span class="output">&#x2713; Created React app with Vite
+&#x2713; Installed lightweight-charts, recharts
+&#x2713; Built CandlestickChart component with WebSocket feed
+&#x2713; Built OrderBook with bid/ask visualization
+&#x2713; Built AccountPanel with P&amp;L calculations
+&#x2713; Dark theme with CSS custom properties</span></pre>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-content">
+          <h4>Preview and iterate</h4>
+          <pre><span class="prompt">&gt; </span>start a preview and take a screenshot
+<span class="output">&#x2713; Dev server running on port 5173
+&#x2713; Preview started
+&#x2713; Screenshot saved - looks good! The candlestick chart
+  is rendering with sample data. Ready for live data feed.</span></pre>
+        </div>
+      </div>
+    </div>
+  </details>
+</section>
+
+</main>
+</div>
+
+<!-- ════════ FOOTER ════════ -->
+<footer>
+  <div class="brand">SKD International</div>
+  <p style="margin-top:8px">&copy; 2026 &mdash; Built with Claude Code</p>
+</footer>
+
+<!-- Back to top -->
+<button class="back-top" id="backTop" onclick="window.scrollTo({top:0,behavior:'smooth'})" aria-label="Back to top">&#x2191;</button>
+
+<!-- ════════ SCRIPTS ════════ -->
+<script>
+// Progress bar
+const progress = document.getElementById('progress');
+window.addEventListener('scroll', () => {
+  const h = document.documentElement;
+  const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+  progress.style.width = pct + '%';
+  document.getElementById('backTop').classList.toggle('show', h.scrollTop > 400);
+});
+
+// Active TOC link
+const sections = document.querySelectorAll('.section');
+const tocLinks = document.querySelectorAll('.sidebar a');
+const observer = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      tocLinks.forEach(l => l.classList.remove('active'));
+      const link = document.querySelector(`.sidebar a[href="#${e.target.id}"]`);
+      if (link) link.classList.add('active');
+    }
+  });
+}, { rootMargin: '-20% 0px -60% 0px' });
+sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>
