@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SKD International — Windows Setup Guide</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --orange: #d29922;
+    --red: #f85149;
+    --purple: #bc8cff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.5rem;
+  }
+  h2 {
+    font-size: 1.4rem;
+    margin: 2rem 0 1rem;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  h2 .step {
+    background: var(--accent);
+    color: var(--bg);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.85rem;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .card p { color: var(--muted); margin-bottom: 0.75rem; }
+  .note {
+    background: rgba(210,153,34,0.1);
+    border-left: 3px solid var(--orange);
+    padding: 0.75rem 1rem;
+    border-radius: 0 8px 8px 0;
+    margin: 0.75rem 0;
+    font-size: 0.9rem;
+  }
+  pre {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    overflow-x: auto;
+    font-family: 'Cascadia Code', 'Fira Code', monospace;
+    font-size: 0.9rem;
+    margin: 0.75rem 0;
+  }
+  code { color: var(--green); }
+  .comment { color: var(--muted); }
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    margin-right: 4px;
+  }
+  .tag.required { background: rgba(248,81,73,0.15); color: var(--red); }
+  .tag.optional { background: rgba(210,153,34,0.15); color: var(--orange); }
+  .tag.recommended { background: rgba(63,185,80,0.15); color: var(--green); }
+  .checklist { list-style: none; padding: 0; }
+  .checklist li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .check { color: var(--green); flex-shrink: 0; }
+  .app-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 0.75rem;
+    margin: 1rem 0;
+  }
+  .app-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+  }
+  .app-item .name { font-weight: 600; }
+  .app-item .desc { font-size: 0.8rem; color: var(--muted); }
+  .tabs {
+    display: flex;
+    gap: 0;
+    margin-bottom: -1px;
+    position: relative;
+    z-index: 1;
+  }
+  .tab {
+    padding: 0.5rem 1rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-bottom: 1px solid var(--surface);
+    border-radius: 8px 8px 0 0;
+    cursor: pointer;
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  .tab.active {
+    background: var(--surface);
+    color: var(--text);
+    border-bottom-color: var(--surface);
+  }
+  footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.85rem;
+    text-align: center;
+  }
+  a { color: var(--accent); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+</style>
+</head>
+<body>
+
+<h1>Windows Setup Guide</h1>
+<p class="subtitle">SKD International — Development Environment Setup for Windows 10/11</p>
+
+<!-- STEP 1 -->
+<h2><span class="step">1</span> Windows Terminal &amp; Package Manager</h2>
+<div class="card">
+  <p>Install Windows Terminal from the Microsoft Store, then set up winget (built into Windows 11) or install Scoop.</p>
+  <div class="note">Open all terminals as <strong>Administrator</strong> for installation steps.</div>
+  <pre><code><span class="comment"># Option A: winget (built-in on Windows 11)</span>
+winget --version
+
+<span class="comment"># Option B: Scoop (if winget unavailable)</span>
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+Invoke-RestMethod -Uri https://get.scoop.sh | Invoke-Expression</code></pre>
+</div>
+
+<!-- STEP 2 -->
+<h2><span class="step">2</span> Core Tools</h2>
+<div class="card">
+  <p>Install Git, Python, Node.js, and Docker.</p>
+  <pre><code><span class="comment"># Using winget</span>
+winget install Git.Git
+winget install Python.Python.3.12
+winget install OpenJS.NodeJS.LTS
+winget install Docker.DockerDesktop
+winget install GitHub.cli
+
+<span class="comment"># Restart terminal after installations</span>
+
+<span class="comment"># Verify</span>
+git --version
+python --version
+node --version
+docker --version
+gh --version</code></pre>
+</div>
+
+<!-- STEP 3 -->
+<h2><span class="step">3</span> SSH Key &amp; GitHub</h2>
+<div class="card">
+  <p>Generate an SSH key and connect to GitHub.</p>
+  <pre><code><span class="comment"># Generate SSH key</span>
+ssh-keygen -t ed25519 -C "your-email@example.com"
+
+<span class="comment"># Start SSH agent</span>
+Get-Service ssh-agent | Set-Service -StartupType Automatic
+Start-Service ssh-agent
+ssh-add ~/.ssh/id_ed25519
+
+<span class="comment"># Copy public key to clipboard</span>
+Get-Content ~/.ssh/id_ed25519.pub | Set-Clipboard
+
+<span class="comment"># Add to GitHub: Settings → SSH Keys → New SSH Key → Paste</span>
+
+<span class="comment"># Authenticate with GitHub CLI</span>
+gh auth login
+
+<span class="comment"># Clone the org repos</span>
+mkdir ~/Documents/skd
+cd ~/Documents/skd
+gh repo clone SKD-international/brain
+gh repo clone SKD-international/trading-infra
+gh repo clone SKD-international/oanda-mcp
+gh repo clone SKD-international/docs</code></pre>
+</div>
+
+<!-- STEP 4 -->
+<h2><span class="step">4</span> Applications</h2>
+<div class="card">
+  <p>Install all required and recommended apps.</p>
+  <pre><code><span class="comment"># Required</span>
+winget install Microsoft.VisualStudioCode
+winget install Obsidian.Obsidian
+winget install Discord.Discord
+winget install SlackTechnologies.Slack
+
+<span class="comment"># Recommended</span>
+winget install Google.Chrome
+winget install Notion.Notion</code></pre>
+
+  <div class="app-grid">
+    <div class="app-item">
+      <div><div class="name">VS Code <span class="tag required">required</span></div><div class="desc">Primary code editor</div></div>
+    </div>
+    <div class="app-item">
+      <div><div class="name">Obsidian <span class="tag required">required</span></div><div class="desc">Knowledge base (BrainVault)</div></div>
+    </div>
+    <div class="app-item">
+      <div><div class="name">Discord <span class="tag required">required</span></div><div class="desc">Team communication</div></div>
+    </div>
+    <div class="app-item">
+      <div><div class="name">Slack <span class="tag required">required</span></div><div class="desc">Work communication</div></div>
+    </div>
+    <div class="app-item">
+      <div><div class="name">Docker Desktop <span class="tag required">required</span></div><div class="desc">Container runtime</div></div>
+    </div>
+    <div class="app-item">
+      <div><div class="name">Windows Terminal <span class="tag required">required</span></div><div class="desc">Modern terminal</div></div>
+    </div>
+    <div class="app-item">
+      <div><div class="name">Chrome <span class="tag recommended">recommended</span></div><div class="desc">Dev tools &amp; extensions</div></div>
+    </div>
+    <div class="app-item">
+      <div><div class="name">Notion <span class="tag recommended">recommended</span></div><div class="desc">Project management</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- STEP 5 -->
+<h2><span class="step">5</span> Python Environment</h2>
+<div class="card">
+  <p>Set up Python with a virtual environment for trading and ML work.</p>
+  <pre><code><span class="comment"># Create project venv</span>
+cd ~/Documents/skd/trading-infra
+python -m venv .venv
+.venv\Scripts\activate
+
+<span class="comment"># Install core packages</span>
+pip install fastapi uvicorn redis aiosqlite httpx
+pip install catboost lightgbm xgboost scikit-learn
+pip install pandas numpy
+pip install oandapyV20</code></pre>
+  <div class="note"><strong>Note:</strong> TA-Lib on Windows requires a pre-built wheel. Download from <a href="https://github.com/cgohlke/talib-build/releases">github.com/cgohlke/talib-build</a> and install with <code>pip install TA_Lib‑*.whl</code></div>
+</div>
+
+<!-- STEP 6 -->
+<h2><span class="step">6</span> Obsidian (BrainVault)</h2>
+<div class="card">
+  <p>Set up the shared knowledge base with Git sync.</p>
+  <pre><code><span class="comment"># The brain repo is already cloned from Step 3</span>
+<span class="comment"># Open Obsidian → Open Folder as Vault → ~/Documents/skd/brain</span>
+
+<span class="comment"># Install community plugins:</span>
+<span class="comment"># 1. Settings → Community Plugins → Turn on</span>
+<span class="comment"># 2. Browse → search "Obsidian Git" → Install → Enable</span>
+<span class="comment"># 3. Obsidian Git settings:</span>
+<span class="comment">#    - Auto pull interval: 5 minutes</span>
+<span class="comment">#    - Auto push interval: 10 minutes</span>
+<span class="comment">#    - Pull on startup: ON</span></code></pre>
+</div>
+
+<!-- STEP 7 -->
+<h2><span class="step">7</span> Claude Code</h2>
+<div class="card">
+  <p>Install Claude Code for AI-powered development. <span class="tag optional">optional</span></p>
+  <pre><code><span class="comment"># Install Claude Code</span>
+npm install -g @anthropic-ai/claude-code
+
+<span class="comment"># Run in any project directory</span>
+cd ~/Documents/skd/trading-infra
+claude</code></pre>
+</div>
+
+<!-- STEP 8 -->
+<h2><span class="step">8</span> Hetzner VPS Access</h2>
+<div class="card">
+  <p>Connect to the shared production server.</p>
+  <pre><code><span class="comment"># Send your SSH public key to Niksa</span>
+Get-Content ~/.ssh/id_ed25519.pub
+
+<span class="comment"># Once added, connect:</span>
+ssh your-username@204.168.169.124
+
+<span class="comment"># Services running:</span>
+<span class="comment"># - n8n: http://204.168.169.124:5678</span>
+<span class="comment"># - Netdata: http://204.168.169.124:19999</span></code></pre>
+</div>
+
+<!-- WSL (OPTIONAL) -->
+<h2><span class="step">+</span> WSL2 (Advanced)</h2>
+<div class="card">
+  <p>For a Linux-like development experience on Windows. <span class="tag optional">optional</span></p>
+  <pre><code><span class="comment"># Install WSL2 with Ubuntu</span>
+wsl --install
+
+<span class="comment"># After restart, set up Ubuntu:</span>
+sudo apt update && sudo apt upgrade -y
+sudo apt install python3 python3-pip python3-venv nodejs npm redis-tools
+
+<span class="comment"># Docker Desktop integrates with WSL2 automatically</span></code></pre>
+  <div class="note">WSL2 gives you a real Linux environment. Recommended if you want parity with the Hetzner server (Ubuntu ARM64).</div>
+</div>
+
+<!-- CHECKLIST -->
+<h2><span class="step">✓</span> Final Checklist</h2>
+<div class="card">
+  <ul class="checklist">
+    <li><span class="check">□</span> Windows Terminal installed</li>
+    <li><span class="check">□</span> Git, Python, Node.js, Docker installed</li>
+    <li><span class="check">□</span> SSH key generated and added to GitHub</li>
+    <li><span class="check">□</span> GitHub CLI authenticated</li>
+    <li><span class="check">□</span> All SKD repos cloned</li>
+    <li><span class="check">□</span> VS Code, Obsidian, Discord installed</li>
+    <li><span class="check">□</span> Python venv created with dependencies</li>
+    <li><span class="check">□</span> BrainVault open in Obsidian with Git plugin</li>
+    <li><span class="check">□</span> SSH access to Hetzner VPS confirmed</li>
+    <li><span class="check">□</span> Joined SKD Discord server</li>
+  </ul>
+</div>
+
+<footer>
+  SKD International &mdash; 2026 &mdash; <a href="https://github.com/SKD-international">github.com/SKD-international</a>
+</footer>
+
+</body>
+</html>
