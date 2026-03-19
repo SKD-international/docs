@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SKD International — API Keys & Token Policy</title>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --border: #30363d;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --accent: #58a6ff;
+    --green: #3fb950;
+    --orange: #d29922;
+    --red: #f85149;
+    --purple: #bc8cff;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.6;
+    padding: 2rem;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  h1 {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+    background: linear-gradient(135deg, var(--accent), var(--purple));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 1.1rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1.5rem;
+  }
+  h2 {
+    font-size: 1.4rem;
+    margin: 2rem 0 1rem;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .card p { color: var(--muted); margin-bottom: 0.75rem; }
+  .warning {
+    background: rgba(248,81,73,0.1);
+    border: 1px solid var(--red);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
+  .warning h3 { color: var(--red); margin-bottom: 0.5rem; }
+  .cost-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+  }
+  .cost-table th, .cost-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--border);
+  }
+  .cost-table th {
+    color: var(--muted);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .you { color: var(--red); font-weight: 600; }
+  .them { color: var(--green); font-weight: 600; }
+  .shared { color: var(--orange); font-weight: 600; }
+  .free { color: var(--green); }
+  pre {
+    background: #0d1117;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    overflow-x: auto;
+    font-family: 'SF Mono', 'Cascadia Code', monospace;
+    font-size: 0.9rem;
+    margin: 0.75rem 0;
+  }
+  code { color: var(--green); }
+  .comment { color: var(--muted); }
+  .note {
+    background: rgba(210,153,34,0.1);
+    border-left: 3px solid var(--orange);
+    padding: 0.75rem 1rem;
+    border-radius: 0 8px 8px 0;
+    margin: 0.75rem 0;
+    font-size: 0.9rem;
+  }
+  .option-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 1rem 0;
+  }
+  .option {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1.25rem;
+  }
+  .option h4 { margin-bottom: 0.25rem; }
+  .option .price { color: var(--accent); font-size: 1.2rem; font-weight: 700; }
+  .option .detail { color: var(--muted); font-size: 0.85rem; margin-top: 0.5rem; }
+  .best { border-color: var(--green); }
+  .best::before {
+    content: "BEST VALUE";
+    display: inline-block;
+    background: var(--green);
+    color: var(--bg);
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 4px;
+    margin-bottom: 0.5rem;
+  }
+  .rule-list { list-style: none; padding: 0; }
+  .rule-list li {
+    padding: 0.75rem 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+  }
+  .rule-list li:last-child { border-bottom: none; }
+  .rule-icon { font-size: 1.2rem; flex-shrink: 0; }
+  footer {
+    margin-top: 3rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 0.85rem;
+    text-align: center;
+  }
+  a { color: var(--accent); text-decoration: none; }
+</style>
+</head>
+<body>
+
+<h1>API Keys &amp; Token Policy</h1>
+<p class="subtitle">SKD International — Who pays for what and how to set up your own keys</p>
+
+<!-- WARNING -->
+<div class="warning">
+  <h3>Golden Rule</h3>
+  <p style="color: var(--text); font-size: 1.05rem;">Everyone provides and pays for their own AI API keys. No exceptions. SKD does not cover individual AI usage costs.</p>
+</div>
+
+<!-- COST BREAKDOWN -->
+<h2>Who Pays for What</h2>
+<div class="card">
+  <table class="cost-table">
+    <thead>
+      <tr><th>Service</th><th>Cost</th><th>Who Pays</th></tr>
+    </thead>
+    <tbody>
+      <tr><td>Claude Code / Claude API</td><td>Your plan</td><td class="them">You (your own account)</td></tr>
+      <tr><td>Claude.ai (web/app)</td><td>Free or $20/mo Pro</td><td class="them">You (your own account)</td></tr>
+      <tr><td>ChatGPT / OpenAI API</td><td>Your plan</td><td class="them">You (your own account)</td></tr>
+      <tr><td>Any other AI API</td><td>Varies</td><td class="them">You (your own account)</td></tr>
+      <tr><td>Hetzner VPS</td><td>~€14/month</td><td class="shared">SKD (shared infra)</td></tr>
+      <tr><td>Domain names</td><td>~€10/year</td><td class="shared">SKD (shared infra)</td></tr>
+      <tr><td>GitHub org</td><td>Free</td><td class="free">Free</td></tr>
+      <tr><td>Discord server</td><td>Free</td><td class="free">Free</td></tr>
+      <tr><td>Obsidian</td><td>Free</td><td class="free">Free</td></tr>
+      <tr><td>n8n (self-hosted)</td><td>Free</td><td class="free">Free (runs on VPS)</td></tr>
+      <tr><td>MCP servers</td><td>Free</td><td class="free">Free (open source)</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- CLAUDE CODE OPTIONS -->
+<h2>Claude Code — Your Options</h2>
+<div class="card">
+  <p>Claude Code is the AI coding assistant we use. Here's how to get access:</p>
+
+  <div class="option-grid">
+    <div class="option">
+      <h4>API Credits (Pay-as-you-go)</h4>
+      <div class="price">~$5-30/month</div>
+      <div class="detail">
+        Buy credits at console.anthropic.com<br>
+        You pay per token used<br>
+        Good for light/moderate usage<br>
+        Set a spending limit to avoid surprises
+      </div>
+    </div>
+    <div class="option best">
+      <h4>Claude Max Subscription</h4>
+      <div class="price">$100/month</div>
+      <div class="detail">
+        Unlimited Claude Code usage<br>
+        Includes Claude.ai Pro<br>
+        No token counting or worrying<br>
+        Best if you code daily with Claude
+      </div>
+    </div>
+    <div class="option">
+      <h4>Claude Pro</h4>
+      <div class="price">$20/month</div>
+      <div class="detail">
+        Claude.ai web/app only<br>
+        Limited Claude Code usage<br>
+        Good starting point<br>
+        Upgrade to Max if you need more
+      </div>
+    </div>
+    <div class="option">
+      <h4>Free Tier</h4>
+      <div class="price">$0</div>
+      <div class="detail">
+        Very limited usage<br>
+        Rate limited quickly<br>
+        Good for trying it out<br>
+        Not practical for real work
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SETUP INSTRUCTIONS -->
+<h2>How to Set Up Your Keys</h2>
+<div class="card">
+  <h3 style="color: var(--green); margin-bottom: 0.75rem;">Option A: Claude Max / Pro (Recommended)</h3>
+  <p>If you have a Claude subscription, Claude Code authenticates through your browser — no API key needed.</p>
+  <pre><code><span class="comment"># Just run Claude Code — it opens a browser to log in</span>
+claude
+
+<span class="comment"># Follow the authentication link</span>
+<span class="comment"># Log in with your Anthropic account</span>
+<span class="comment"># Done — Claude Code is connected to your subscription</span></code></pre>
+
+  <h3 style="color: var(--green); margin: 1.5rem 0 0.75rem;">Option B: API Key (Pay-as-you-go)</h3>
+  <p>If you prefer pay-per-token, get an API key from the Anthropic Console.</p>
+  <pre><code><span class="comment"># 1. Go to console.anthropic.com</span>
+<span class="comment"># 2. Create an account & add payment method</span>
+<span class="comment"># 3. Settings → API Keys → Create Key</span>
+<span class="comment"># 4. Set a monthly spending limit (recommended: $20-50 to start)</span>
+
+<span class="comment"># Set your API key (add to your shell profile):</span>
+
+<span class="comment"># Mac/Linux (add to ~/.zshrc or ~/.bashrc):</span>
+export ANTHROPIC_API_KEY="sk-ant-your-key-here"
+
+<span class="comment"># Windows WSL (add to ~/.bashrc):</span>
+export ANTHROPIC_API_KEY="sk-ant-your-key-here"
+
+<span class="comment"># Then reload:</span>
+source ~/.bashrc
+
+<span class="comment"># Verify it works:</span>
+claude</code></pre>
+</div>
+
+<!-- SECURITY RULES -->
+<h2>Security Rules</h2>
+<div class="card">
+  <ul class="rule-list">
+    <li>
+      <span class="rule-icon" style="color: var(--red);">X</span>
+      <div><strong>NEVER share your API key</strong> — not in Discord, not in Slack, not in code, not in git commits. If someone asks for your key, say no.</div>
+    </li>
+    <li>
+      <span class="rule-icon" style="color: var(--red);">X</span>
+      <div><strong>NEVER commit API keys to git</strong> — use environment variables or <code>.env</code> files. Our repos have <code>.gitignore</code> that excludes <code>.env</code> files.</div>
+    </li>
+    <li>
+      <span class="rule-icon" style="color: var(--red);">X</span>
+      <div><strong>NEVER use someone else's key</strong> — each person is responsible for their own usage and billing.</div>
+    </li>
+    <li>
+      <span class="rule-icon" style="color: var(--green);">+</span>
+      <div><strong>DO set spending limits</strong> — on console.anthropic.com, set a monthly limit so you don't get surprised. Start with $20-50.</div>
+    </li>
+    <li>
+      <span class="rule-icon" style="color: var(--green);">+</span>
+      <div><strong>DO rotate keys</strong> — if you think a key was exposed, delete it immediately and create a new one.</div>
+    </li>
+    <li>
+      <span class="rule-icon" style="color: var(--green);">+</span>
+      <div><strong>DO use .env files</strong> — for any project that needs API keys, create a <code>.env</code> file (never committed to git).</div>
+    </li>
+  </ul>
+
+  <pre><code><span class="comment"># Example .env file (NEVER commit this)</span>
+ANTHROPIC_API_KEY=sk-ant-your-key-here
+OANDA_API_KEY=your-oanda-key
+OANDA_ACCOUNT_ID=your-account-id
+
+<span class="comment"># Load in Python:</span>
+from dotenv import load_dotenv
+load_dotenv()
+
+<span class="comment"># Your .gitignore should contain:</span>
+.env
+.env.local
+.env.*.local</code></pre>
+</div>
+
+<!-- MCP SERVERS - NO COST -->
+<h2>MCP Servers (Free)</h2>
+<div class="card">
+  <p>MCP servers connect Claude Code to external services. They're free and open source — but they connect to <strong>your</strong> accounts.</p>
+  <div class="note">MCP servers don't cost money, but they authenticate with your personal accounts (Slack, Gmail, GitHub, etc). Each person sets up their own MCP connections. You won't see Niksa's Slack messages — you'll see yours.</div>
+  <p>Each person configures their own MCP servers in <code>~/.claude/settings.json</code>. See the Claude Code guide for setup instructions.</p>
+</div>
+
+<!-- SHARED VPS KEYS -->
+<h2>Shared Server (Hetzner VPS)</h2>
+<div class="card">
+  <p>The VPS runs shared services. API keys for shared services are managed by admins only.</p>
+  <div class="note"><strong>Admins only:</strong> OANDA API keys, Hetzner API token, and other production credentials are stored securely on the server. Members never need or see these keys.</div>
+  <pre><code><span class="comment"># Production keys are in /opt/skd/.env on the server</span>
+<span class="comment"># Only admins (Niksa + xxtox1chxx) have access</span>
+<span class="comment"># If you need to add a service that requires a key,</span>
+<span class="comment"># ask an admin to configure it</span></code></pre>
+</div>
+
+<!-- QUICK START SUMMARY -->
+<h2>TL;DR — Quick Start</h2>
+<div class="card">
+  <ol style="padding-left: 1.5rem; color: var(--text);">
+    <li style="margin-bottom: 0.5rem;">Go to <strong>claude.ai</strong> → create account → subscribe (Pro $20/mo or Max $100/mo)</li>
+    <li style="margin-bottom: 0.5rem;">Run <code>claude</code> in your terminal → authenticate in browser</li>
+    <li style="margin-bottom: 0.5rem;">Start coding. That's it.</li>
+  </ol>
+  <p style="margin-top: 1rem;">If you prefer pay-as-you-go: go to <strong>console.anthropic.com</strong>, add payment, generate API key, set <code>ANTHROPIC_API_KEY</code> in your shell, set a spending limit.</p>
+</div>
+
+<footer>
+  SKD International &mdash; 2026 &mdash; <a href="https://github.com/SKD-international">github.com/SKD-international</a>
+</footer>
+
+</body>
+</html>
