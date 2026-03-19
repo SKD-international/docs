@@ -79,6 +79,14 @@
     margin: 0.75rem 0;
     font-size: 0.9rem;
   }
+  .warning {
+    background: rgba(248,81,73,0.1);
+    border-left: 3px solid var(--red);
+    padding: 0.75rem 1rem;
+    border-radius: 0 8px 8px 0;
+    margin: 0.75rem 0;
+    font-size: 0.9rem;
+  }
   pre {
     background: #0d1117;
     border: 1px solid var(--border);
@@ -304,45 +312,135 @@ pip install oandapyV20</code></pre>
 </div>
 
 <!-- STEP 7 -->
-<h2><span class="step">7</span> Claude Code</h2>
+<h2><span class="step">7</span> WSL2 (Required for Claude Code)</h2>
 <div class="card">
-  <p>Install Claude Code for AI-powered development. <span class="tag optional">optional</span></p>
-  <pre><code><span class="comment"># Install Claude Code</span>
-npm install -g @anthropic-ai/claude-code
+  <p>Claude Code does <strong>not</strong> run natively on Windows. You need WSL2 (Windows Subsystem for Linux) — it gives you a real Ubuntu environment inside Windows. <span class="tag required">required</span></p>
+  <div class="warning">This is <strong>not optional</strong> if you want to use Claude Code. It's also recommended for Python/Docker development parity with the Hetzner server.</div>
+  <pre><code><span class="comment"># Step 1: Install WSL2 (run in PowerShell as Admin)</span>
+wsl --install
 
-<span class="comment"># Run in any project directory</span>
-cd ~/Documents/skd/trading-infra
-claude</code></pre>
+<span class="comment"># This installs Ubuntu by default. RESTART your PC when prompted.</span>
+
+<span class="comment"># Step 2: After restart, Ubuntu opens automatically.</span>
+<span class="comment"># Create a username and password when prompted.</span>
+
+<span class="comment"># Step 3: Update Ubuntu</span>
+sudo apt update && sudo apt upgrade -y
+
+<span class="comment"># Step 4: Install Node.js (required for Claude Code)</span>
+curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
+sudo apt install -y nodejs
+
+<span class="comment"># Step 5: Install Python and other tools</span>
+sudo apt install -y python3 python3-pip python3-venv git redis-tools
+
+<span class="comment"># Step 6: Set up SSH key inside WSL</span>
+ssh-keygen -t ed25519 -C "your-email@example.com"
+cat ~/.ssh/id_ed25519.pub
+<span class="comment"># Copy the output and add it to GitHub (Settings → SSH Keys)</span>
+
+<span class="comment"># Step 7: Clone repos inside WSL</span>
+mkdir -p ~/skd
+cd ~/skd
+git clone git@github.com:SKD-international/brain.git
+git clone git@github.com:SKD-international/trading-infra.git
+git clone git@github.com:SKD-international/oanda-mcp.git
+git clone git@github.com:SKD-international/docs.git</code></pre>
+  <div class="note"><strong>Tip:</strong> In Windows Terminal, click the dropdown arrow → you'll see "Ubuntu" as an option. Use that for all dev work. You can also open WSL from any folder in File Explorer by typing <code>wsl</code> in the address bar.</div>
+  <div class="note"><strong>VS Code integration:</strong> Install the "WSL" extension in VS Code. Then from your WSL terminal, type <code>code .</code> to open any folder in VS Code with full Linux support.</div>
 </div>
 
 <!-- STEP 8 -->
-<h2><span class="step">8</span> Hetzner VPS Access</h2>
+<h2><span class="step">8</span> Claude Code (inside WSL)</h2>
 <div class="card">
-  <p>Connect to the shared production server.</p>
-  <pre><code><span class="comment"># Send your SSH public key to Niksa</span>
-Get-Content ~/.ssh/id_ed25519.pub
+  <p>Install and run Claude Code inside your WSL2 Ubuntu environment. <span class="tag required">required</span></p>
+  <pre><code><span class="comment"># Make sure you're in WSL (Ubuntu terminal, NOT PowerShell)</span>
 
-<span class="comment"># Once added, connect:</span>
-ssh your-username@204.168.169.124
+<span class="comment"># Install Claude Code</span>
+npm install -g @anthropic-ai/claude-code
 
-<span class="comment"># Services running:</span>
-<span class="comment"># - n8n: http://204.168.169.124:5678</span>
-<span class="comment"># - Netdata: http://204.168.169.124:19999</span></code></pre>
+<span class="comment"># Verify installation</span>
+claude --version
+
+<span class="comment"># Run in any project directory</span>
+cd ~/skd/trading-infra
+claude
+
+<span class="comment"># First time: it will ask you to authenticate with your Anthropic account</span>
+<span class="comment"># Follow the browser link to log in</span></code></pre>
+  <div class="warning"><strong>Common mistake:</strong> Do NOT install Claude Code in PowerShell or CMD. It must be installed and run inside WSL2. If you see errors about "unsupported platform", you're in the wrong terminal.</div>
+  <div class="note"><strong>Access Windows files from WSL:</strong> Your Windows drives are mounted at <code>/mnt/c/</code>, <code>/mnt/d/</code> etc. But for best performance, keep your code inside the WSL filesystem (<code>~/skd/</code>), not on <code>/mnt/c/</code>.</div>
 </div>
 
-<!-- WSL (OPTIONAL) -->
-<h2><span class="step">+</span> WSL2 (Advanced)</h2>
+<!-- STEP 9 -->
+<h2><span class="step">9</span> Docker Desktop + WSL2</h2>
 <div class="card">
-  <p>For a Linux-like development experience on Windows. <span class="tag optional">optional</span></p>
-  <pre><code><span class="comment"># Install WSL2 with Ubuntu</span>
-wsl --install
+  <p>Docker Desktop needs to be configured to use WSL2 as its backend.</p>
+  <pre><code><span class="comment"># Docker Desktop should already be installed from Step 2</span>
+<span class="comment"># Open Docker Desktop → Settings → General</span>
+<span class="comment"># ✅ "Use the WSL 2 based engine" should be checked</span>
 
-<span class="comment"># After restart, set up Ubuntu:</span>
-sudo apt update && sudo apt upgrade -y
-sudo apt install python3 python3-pip python3-venv nodejs npm redis-tools
+<span class="comment"># Settings → Resources → WSL Integration</span>
+<span class="comment"># ✅ Enable integration with your Ubuntu distro</span>
 
-<span class="comment"># Docker Desktop integrates with WSL2 automatically</span></code></pre>
-  <div class="note">WSL2 gives you a real Linux environment. Recommended if you want parity with the Hetzner server (Ubuntu ARM64).</div>
+<span class="comment"># Verify Docker works inside WSL:</span>
+docker run hello-world</code></pre>
+  <div class="note">Once configured, <code>docker</code> and <code>docker compose</code> commands work seamlessly inside WSL. This is how you'll run n8n, Redis, and other containers locally.</div>
+</div>
+
+<!-- STEP 10 -->
+<h2><span class="step">10</span> Hetzner VPS Access</h2>
+<div class="card">
+  <p>Connect to the shared production server. Use WSL terminal for SSH.</p>
+  <pre><code><span class="comment"># From inside WSL — your SSH key is already set up from Step 7</span>
+<span class="comment"># Send your public key to Niksa:</span>
+cat ~/.ssh/id_ed25519.pub
+
+<span class="comment"># Once Niksa adds your key, connect:</span>
+ssh your-username@204.168.169.124
+
+<span class="comment"># Services running on the server:</span>
+<span class="comment"># - n8n (automation): http://204.168.169.124:5678</span>
+<span class="comment"># - Netdata (monitoring): http://204.168.169.124:19999</span>
+
+<span class="comment"># You can also run Claude Code directly on the server:</span>
+ssh your-username@204.168.169.124
+cd /opt/skd/trading-infra
+claude</code></pre>
+  <div class="note"><strong>Phone access:</strong> Install <strong>Termius</strong> (iOS/Android) to SSH into the server from your phone. You can run Claude Code from anywhere.</div>
+</div>
+
+<!-- WINDOWS-SPECIFIC TIPS -->
+<h2><span class="step">!</span> Windows Gotchas</h2>
+<div class="card">
+  <p>Common issues and how to fix them on Windows.</p>
+
+  <h3 style="color: var(--orange); margin: 1rem 0 0.5rem;">Line Endings (CRLF vs LF)</h3>
+  <p>Windows uses CRLF line endings, Linux uses LF. This causes git diffs to show every line as changed. Fix it:</p>
+  <pre><code><span class="comment"># In WSL, set git to use LF</span>
+git config --global core.autocrlf input
+
+<span class="comment"># In Windows (PowerShell), set git to convert</span>
+git config --global core.autocrlf true</code></pre>
+
+  <h3 style="color: var(--orange); margin: 1rem 0 0.5rem;">File Permissions</h3>
+  <p>WSL and Windows handle file permissions differently. If you see permission errors:</p>
+  <pre><code><span class="comment"># Fix SSH key permissions (must be done inside WSL)</span>
+chmod 600 ~/.ssh/id_ed25519
+chmod 644 ~/.ssh/id_ed25519.pub</code></pre>
+
+  <h3 style="color: var(--orange); margin: 1rem 0 0.5rem;">Path Differences</h3>
+  <pre><code><span class="comment"># Windows path:</span>  C:\Users\YourName\Documents\skd
+<span class="comment"># WSL path:</span>      ~/skd  (recommended — faster)
+<span class="comment"># WSL → Windows:</span> /mnt/c/Users/YourName/Documents/skd (slower, avoid for code)</code></pre>
+
+  <h3 style="color: var(--orange); margin: 1rem 0 0.5rem;">Obsidian on Windows + WSL Repos</h3>
+  <p>Obsidian runs on Windows but your repos are in WSL. To access WSL files from Windows:</p>
+  <pre><code><span class="comment"># In File Explorer, type this in the address bar:</span>
+\\wsl$\Ubuntu\home\YOUR_USERNAME\skd\brain
+
+<span class="comment"># Or map it as a network drive for easy access</span></code></pre>
+  <div class="note">Open Obsidian → Open folder as vault → navigate to <code>\\wsl$\Ubuntu\home\YOUR_USERNAME\skd\brain</code></div>
 </div>
 
 <!-- CHECKLIST -->
